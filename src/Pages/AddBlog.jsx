@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-
+import { getFirestore, collection, addDoc } from 'firebase/firestore'; // Import Firestore functions
+import { getAuth } from 'firebase/auth'; // Import auth to fetch current user
+import { useNavigate } from 'react-router-dom';
+import { Typography } from "@mui/material";
 
 function AddBlog() {
   const [blogData, setBlogData] = useState({
@@ -8,8 +11,12 @@ function AddBlog() {
     category: '',
     image: '',
     content: '',
-    customCategory: '', // Field for custom category when 'Other' is selected
+    customCategory: '',
   });
+
+  const username = localStorage.getItem('username'); // Fetch username from local storage
+
+  const navigate = useNavigate(); // Hook to programmatically navigate
 
   // Function to handle form changes
   const handleChange = (e) => {
@@ -21,17 +28,45 @@ function AddBlog() {
   };
 
   // Function to handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // If 'Other' is selected, use customCategory instead of category
     const finalCategory = blogData.category === 'Other' ? blogData.customCategory : blogData.category;
-    const blogSubmission = { ...blogData, category: finalCategory };
+    
+    // Fetch username and email from local storage
+    const username = localStorage.getItem('username'); // assuming 'username' is saved
+    const email = localStorage.getItem('email'); // assuming 'email' is saved
 
-    console.log(blogSubmission); // You can replace this with a function to send data to the backend
+    if (!username || !email) {
+      alert('User information not found, please login first.');
+      navigate('/login');
+      return;
+    }
+
+    const db = getFirestore(); // Initialize Firestore
+    const blogSubmission = {
+      ...blogData,
+      category: finalCategory,
+      username,
+      email,
+      createdAt: new Date().toISOString(), // Add current date/time
+    };
+
+    try {
+      // Add blog data to Firestore (it will auto-generate an ID for the document)
+      const docRef = await addDoc(collection(db, 'blogs'), blogSubmission);
+      console.log('Blog added with ID: ', docRef.id);
+      alert('Blog submitted successfully!');
+      navigate('/user/blogs'); // Redirect to blogs page after submission
+    } catch (error) {
+      console.error('Error adding blog: ', error);
+      alert('Error submitting the blog, please try again.');
+    }
   };
 
+
   return (
-    <div className="bg-white min-h-screen text-navy">
+    <>
+      {username ?(<div className="bg-white min-h-screen text-navy">
       <div className="container mx-auto py-8 px-4">
         <h1 className="text-3xl font-semibold text-center text-navy mb-8">
           Add a New Blog
@@ -165,7 +200,12 @@ function AddBlog() {
           </form>
         </div>
       </div>
-    </div>
+    </div>):(
+      <Typography variant="h6" color="textSecondary">
+      Please login to add a new Blog
+    </Typography>
+    )}
+    </>
   );
 }
 

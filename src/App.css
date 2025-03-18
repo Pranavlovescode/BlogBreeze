@@ -12,20 +12,3 @@ h1 {
   font-family: 'Dancing Script', cursive;
 }
 
-/* index.css or App.css */
-
-html, body {
-  margin: 0; /* Remove default margin */
-  padding: 0; /* Remove default padding */
-  width: 100%; /* Ensure full width */
-  height: 100%; /* Ensure full height */
-}
-
-#root {
-  min-height: 100vh; /* Ensure root takes at least the full viewport height */
-}
-
-footer {
-  margin: 0; /* Ensure footer has no margin */
-  padding: 0; /* Ensure footer has no padding */
-}
