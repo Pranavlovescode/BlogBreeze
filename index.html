@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BlogBreeze</title>
@@ -14,6 +15,29 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
+  <script>
+    // Add event listener to execute code when page loads
+    window.addEventListener('load', () => {
+      // Call registerSW function when page loads
+      registerSW();
+    });
+  
+    // Register the Service Worker
+    async function registerSW() {
+      // Check if browser supports Service Worker
+      if ('serviceWorker' in navigator) {
+        try {
+          // Register the Service Worker named 'serviceworker.js'
+          await navigator.serviceworker.register('serviceworker.js');
+        }
+        catch (e) {
+          // Log error message if registration fails
+          console.log('SW registration failed');
+        }
+      }
+    }
+  </script>
+  
 </html>
 
 
